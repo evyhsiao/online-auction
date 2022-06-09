@@ -1,0 +1,49 @@
+#top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+em {
+    margin: 1.5rem;
+    font-size: 20px;
+}
+
+#products {
+    margin: auto;
+    width: 1300px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 50px;
+    flex-wrap: wrap;
+}
+
+li {
+    margin: auto;
+    width: 200px;
+    display: grid;
+    grid-template-rows: 50px 50px 1fr auto;
+}
+
+img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+h4,p,h5 {
+    margin: 10px;
+    padding: 0;
+    text-align: center;
+}
+
+.onSales {
+    background-color: aquamarine;
+    color: brown;
+    text-align: center;
+}
+
+#fishTime {
+    color: brown;
+}

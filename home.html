@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="home.css">
+  <title>EvyTown</title>
+  <script src="js/web3.min.js"></script>
+</head>
+<body>
+  <div id="top">
+    <em id="showAccount"></em>
+    <em id="showBalance"></em>
+  </div>
+  <div>
+    <ul id="products">
+      <li>
+        <h4 id="fishState">非賣品</h4>
+        <p id="fishTime"></p>
+        <img alt="fish" src="image/fish.png"></img>
+        <h5>Fish</h5>
+        <p>Owner:&nbsp<em id="getOwner"></em></p>
+        <button onclick="sale('fish')">拍賣</button>
+        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
+      </li>
+      <li>
+        <h4 class="State">非賣品</h4>
+        <p id="appleTime"></p>
+        <img alt="apple" src="image/apple.png"></img>
+        <h5>Apple</h5>
+        <p>Owner:&nbsp<em id="getOwner"></em></p>
+        <button id="apple" class="sale">拍賣</button>
+        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
+      </li>
+      <li>
+        <h4 class="State">非賣品</h4>
+        <p id="goldTime"></p>
+        <img alt="gold" src="image/gold.png"></img>
+        <h5>Gold</h5>
+        <p>Owner:&nbsp<em id="getOwner"></em></p>
+        <button id="gold" class="sale">拍賣</button>
+        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
+      </li>
+      <li>
+        <h4 class="State">非賣品</h4>
+        <p id="computerTime"></p>
+        <img alt="computer" src="image/computer.jpg"></img>
+        <h5>Computer</h5>
+        <p>Owner:&nbsp<em id="getOwner"></em></p>
+        <button id="computer" class="sale">拍賣</button>
+        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
+      </li>
+      <li>
+        <h4 class="State">非賣品</h4>
+        <p id="flowerTime"></p>
+        <img alt="flower" src="image/flower.jpg"></img>
+        <h5>Flower</h5>
+        <p>Owner:&nbsp<em id="getOwner"></em></p>
+        <button id="flower" class="sale">拍賣</button>
+        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
+      </li>
+    </ul>
+  </div>
+  
+
+  <script>
+    web3 = new Web3(window.ethereum)
+    window.ethereum.enable().catch(error => {
+      // User denied account access
+      console.log(error)
+    });
+
+    var Contract;
+    var abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"tokenOwner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"productName","type":"string"},{"internalType":"address","name":"winner","type":"address"}],"name":"changeOwner","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"productName","type":"string"}],"name":"getOwnership","outputs":[{"internalType":"address","name":"owner","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"master","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}];
+    var address = "0x0590f9810061fea9ff94aa89b840f9ffd84470d0";
+    // let myAccount = "0x9375888232e4E00ef5a4266407dFA70BAbE07550";
+    // let myAccount2 = "0xda956f31E2678a52A1612eeC2C7128088cDd125c";
+    
+    async function init() {
+      Contract = await new web3.eth.Contract(abi, address);
+      var accounts = await web3.eth.getAccounts();
+      document.getElementById("showAccount").textContent = "Welcome "+accounts[0];
+      Contract.methods.balanceOf(accounts[0]).call()
+        .then(function (data) {
+            document.getElementById("showBalance").textContent = data+" EvyCoin";
+        })
+    }
+
+    init();
+
+    var productName = "";
+    var num = 0;
+    function sale(name) {
+      productName = name;
+      document.getElementById(name+"State").textContent = "競價中";
+      document.getElementById(name+"State").className = "onSales";
+      document.getElementById(name+"Time").textContent = "00:01:00";
+      num = 0;
+      console.log(num);
+      setTimeout(countDown,1000);
+    }
+
+    function countDown() {
+      console.log(num);
+      if (num == 0) {
+        document.getElementById(name+"Time").textContent = "00:00:59";
+        num += 1;
+        setTimeout(countDown,1000);
+      }
+      else {
+        if (num == 60) {
+          document.getElementById(name+"Time").textContent = "00:00:00";
+          setTimeout(endSale,1000);
+        } 
+        else if (num >= 50){
+          document.getElementById(name+"Time").textContent = "00:00:0"+(59-num);
+          num += 1;
+          setTimeout(countDown,1000);
+        } 
+        else {
+          document.getElementById(name+"Time").textContent = "00:00:"+(59-num);
+          num += 1;
+          setTimeout(countDown,1000);
+        }
+          
+      }
+    }
+
+    function endSale() {
+      document.getElementById(name+"State").textContent = "非賣品";
+      document.getElementById(name+"Time").className = "競價結束";
+    }
+
+    // async function getCoin() {
+    //     var accounts = await web3.eth.getAccounts();
+    //     Contract.methods.transfer(accounts[0], 100).call()
+    //         .then(function (data) {
+    //             document.getElementById("getCoinSuccess").textContent = data;
+    //         })
+    // }
+
+    // async function pay() {
+    //     var accounts = await web3.eth.getAccounts();
+    //     var str = document.getElementById('donate').value;
+    //     Contract.methods.pay()
+    //         .send({ from: accounts[0], value: web3.utils.toWei(str, "ether") })
+    //         .then(function (data) {
+    //             console.log(data);
+    //         })
+
+    // }
+    // document.getElementById("viewAccount").addEventListener('click', viewAccount);
+    // document.getElementById("getCoin").addEventListener('click', getCoin);
+    // document.getElementById('pay').addEventListener('click', pay);
+  </script>
+</body>
+</html>
