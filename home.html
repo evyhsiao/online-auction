@@ -14,145 +14,143 @@
     <em id="showBalance"></em>
   </div>
   <div>
-    <ul id="products">
-      <li>
-        <h4 id="fishState">非賣品</h4>
-        <p id="fishTime"></p>
-        <img alt="fish" src="image/fish.png"></img>
-        <h5>Fish</h5>
-        <p>Owner:&nbsp<em id="getOwner"></em></p>
-        <button onclick="sale('fish')">拍賣</button>
-        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
-      </li>
-      <li>
-        <h4 class="State">非賣品</h4>
-        <p id="appleTime"></p>
-        <img alt="apple" src="image/apple.png"></img>
-        <h5>Apple</h5>
-        <p>Owner:&nbsp<em id="getOwner"></em></p>
-        <button id="apple" class="sale">拍賣</button>
-        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
-      </li>
-      <li>
-        <h4 class="State">非賣品</h4>
-        <p id="goldTime"></p>
-        <img alt="gold" src="image/gold.png"></img>
-        <h5>Gold</h5>
-        <p>Owner:&nbsp<em id="getOwner"></em></p>
-        <button id="gold" class="sale">拍賣</button>
-        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
-      </li>
-      <li>
-        <h4 class="State">非賣品</h4>
-        <p id="computerTime"></p>
-        <img alt="computer" src="image/computer.jpg"></img>
-        <h5>Computer</h5>
-        <p>Owner:&nbsp<em id="getOwner"></em></p>
-        <button id="computer" class="sale">拍賣</button>
-        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
-      </li>
-      <li>
-        <h4 class="State">非賣品</h4>
-        <p id="flowerTime"></p>
-        <img alt="flower" src="image/flower.jpg"></img>
-        <h5>Flower</h5>
-        <p>Owner:&nbsp<em id="getOwner"></em></p>
-        <button id="flower" class="sale">拍賣</button>
-        <strong style="display: none;">目前最高價：<span id="maxPrice"></span></strong>
-      </li>
-    </ul>
+    <ul id="products"></ul>
   </div>
   
 
   <script>
-    web3 = new Web3(window.ethereum)
-    window.ethereum.enable().catch(error => {
-      // User denied account access
-      console.log(error)
-    });
+    var products = ["Fish", "Apple", "Gold", "Computer", "Flower"];
+    var productStruct = "";
+    function buildProduct () {
+      let element = document.getElementById("products");
+      products.forEach(productName => {
+        productStruct = "<li>\
+        <h4 id='"+productName+"State'>非賣品</h4>\
+        <img alt='"+productName+"' src='image/"+productName+".jpg'></img>\
+        <h4>"+productName+"</h4>\
+        <p id='"+productName+"Owner'></p>\
+        <button id='"+productName+"SaleBtn' onclick=\"sale('"+productName+"')\">拍賣</button>\
+        <div id='"+productName+"Bid' class='notSales'>\
+        <p id='"+productName+"MaxPrice'>目前最高價：</p>\
+        <p id='"+productName+"MaxBidder'>出價者：</p>\
+        <input id='"+productName+"BidValue' type='text' placeholder='input the price to bid it'>\
+        <button id='"+productName+"BidBtn'onclick=\"bid('"+productName+"')\">出價</button>\
+        </div>\
+        </li>";
+        element.innerHTML += productStruct;
+      });
+    }
 
     var Contract;
-    var abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"tokenOwner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"productName","type":"string"},{"internalType":"address","name":"winner","type":"address"}],"name":"changeOwner","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"productName","type":"string"}],"name":"getOwnership","outputs":[{"internalType":"address","name":"owner","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"master","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"}];
-    var address = "0x0590f9810061fea9ff94aa89b840f9ffd84470d0";
-    // let myAccount = "0x9375888232e4E00ef5a4266407dFA70BAbE07550";
-    // let myAccount2 = "0xda956f31E2678a52A1612eeC2C7128088cDd125c";
-    
+    var abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"tokenOwner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"_from","type":"address"},{"indexed":true,"internalType":"address","name":"_to","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"acceptOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"tokenOwner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"remaining","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"approveAndCall","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"tokenOwner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"productName","type":"string"},{"internalType":"address","name":"winner","type":"address"}],"name":"changeOwner","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"productName","type":"string"}],"name":"getOwnership","outputs":[{"internalType":"address","name":"owner","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"master","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"newOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"tokenAddress","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"transferAnyERC20Token","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokens","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"success","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+    var address = "0x006b55346BeB563C06A83198a4CBC2ac7C8293F8";
+    var curAccount;
+    const web3 = new Web3(window.web3.currentProvider);
+    window.ethereum.enable().catch(error => {
+      console.log(error)
+    });
+    web3.eth.setProvider(Web3.givenProvider)
+  
+    async function writeInfo(account) {
+      document.getElementById("showAccount").textContent = "Welcome "+account;
+      await Contract.methods.balanceOf(account).call()
+        .then(function (data) {
+            document.getElementById("showBalance").textContent = data+" EvyCoin";
+      })
+      products.forEach(productName => {
+        Contract.methods.getOwnership(productName.toLowerCase()).call()
+        .then(function (data) {
+          console.log(data);
+          document.getElementById(productName+"Owner").textContent = "Owner "+data;
+          if (account.toLowerCase() == data.toLowerCase()) {
+            console.log("==")
+            document.getElementById(productName+"SaleBtn").className = "able";
+          }
+          else {
+            console.log("!=")
+            document.getElementById(productName+"SaleBtn").className = "disable";
+          }
+        })
+      })
+    }
+
     async function init() {
       Contract = await new web3.eth.Contract(abi, address);
       var accounts = await web3.eth.getAccounts();
-      document.getElementById("showAccount").textContent = "Welcome "+accounts[0];
-      Contract.methods.balanceOf(accounts[0]).call()
-        .then(function (data) {
-            document.getElementById("showBalance").textContent = data+" EvyCoin";
-        })
+      curAccount = accounts[0];
+      buildProduct();
+      writeInfo(curAccount);
+      window.ethereum.on('accountsChanged', function (accounts) {
+        curAccount = accounts[0];
+        console.log("account changed");
+        writeInfo(curAccount);
+      });
     }
 
     init();
 
-    var productName = "";
-    var num = 0;
-    function sale(name) {
+    var maxPrice = 0;
+    var maxBidder = "";
+    var owner = "";
+    async function bid(name) {
       productName = name;
-      document.getElementById(name+"State").textContent = "競價中";
-      document.getElementById(name+"State").className = "onSales";
-      document.getElementById(name+"Time").textContent = "00:01:00";
-      num = 0;
-      console.log(num);
-      setTimeout(countDown,1000);
+      await Contract.methods.getOwnership(productName.toLowerCase()).call()
+        .then(function (data) {
+          owner = data;
+        })
+
+      if (document.getElementById(name+"BidValue").value > maxPrice) {
+        maxPrice = document.getElementById(name+"BidValue").value;
+        maxBidder = curAccount;
+        document.getElementById(name+"MaxPrice").textContent = "目前最高價："+maxPrice;
+        document.getElementById(name+"MaxBidder").textContent = "出價者："+curAccount;
+        console.log(maxBidder, maxPrice);
+        console.log(curAccount==maxBidder)
+        await Contract.methods.approve(owner, maxPrice).send({
+          from: maxBidder
+        })
+      }
     }
 
-    function countDown() {
-      console.log(num);
-      if (num == 0) {
-        document.getElementById(name+"Time").textContent = "00:00:59";
-        num += 1;
-        setTimeout(countDown,1000);
-      }
-      else {
-        if (num == 60) {
-          document.getElementById(name+"Time").textContent = "00:00:00";
-          setTimeout(endSale,1000);
-        } 
-        else if (num >= 50){
-          document.getElementById(name+"Time").textContent = "00:00:0"+(59-num);
-          num += 1;
-          setTimeout(countDown,1000);
-        } 
-        else {
-          document.getElementById(name+"Time").textContent = "00:00:"+(59-num);
-          num += 1;
-          setTimeout(countDown,1000);
+    var productName = "";
+    var transactSuccess = false;
+    async function sale(name) {
+      productName = name;
+      if (document.getElementById(name+"SaleBtn").className == "able") {
+        if (document.getElementById(name+"SaleBtn").textContent == "拍賣") {
+          document.getElementById(name+"State").textContent = "競價中";
+          document.getElementById(name+"SaleBtn").textContent = "結束拍賣";
+          document.getElementById(name+"State").className = "onSales";
+          document.getElementById(name+"Bid").className = "onBid";
         }
-          
+        else {
+          document.getElementById(name+"State").textContent = "非賣品";
+          document.getElementById(name+"SaleBtn").textContent = "拍賣";
+          document.getElementById(name+"State").className = "";
+          document.getElementById(name+"Bid").className = "notSales";
+          document.getElementById(name+"MaxPrice").textContent = "目前最高價：";
+          document.getElementById(name+"MaxBidder").textContent = "出價者：";
+          document.getElementById(name+"BidValue").value = "";
+          if (maxPrice != 0 && maxBidder != "") {
+            await Contract.methods.transferFrom(maxBidder,owner,maxPrice)
+              .send({from: curAccount}, function(err, res) {
+              if (err == null) {transactSuccess=true}
+              })
+          }
+          console.log(transactSuccess);
+          if (transactSuccess) {
+            console.log("change owner");
+            await Contract.methods.changeOwner(productName.toLowerCase(), maxBidder)
+            .send({from: curAccount}, function(err, res) {
+              if (err == null) {
+                document.getElementById(productName+"Owner").textContent = "Owner "+maxBidder;
+                document.getElementById(productName+"SaleBtn").className = "disable";
+              }
+            })
+          }
+        }
       }
     }
-
-    function endSale() {
-      document.getElementById(name+"State").textContent = "非賣品";
-      document.getElementById(name+"Time").className = "競價結束";
-    }
-
-    // async function getCoin() {
-    //     var accounts = await web3.eth.getAccounts();
-    //     Contract.methods.transfer(accounts[0], 100).call()
-    //         .then(function (data) {
-    //             document.getElementById("getCoinSuccess").textContent = data;
-    //         })
-    // }
-
-    // async function pay() {
-    //     var accounts = await web3.eth.getAccounts();
-    //     var str = document.getElementById('donate').value;
-    //     Contract.methods.pay()
-    //         .send({ from: accounts[0], value: web3.utils.toWei(str, "ether") })
-    //         .then(function (data) {
-    //             console.log(data);
-    //         })
-
-    // }
-    // document.getElementById("viewAccount").addEventListener('click', viewAccount);
-    // document.getElementById("getCoin").addEventListener('click', getCoin);
-    // document.getElementById('pay').addEventListener('click', pay);
   </script>
 </body>
 </html>
