@@ -124,7 +124,7 @@
           document.getElementById(name+"Bid").className = "onBid";
         }
         else {
-          document.getElementById(name+"State").textContent = "非賣品";
+          document.getElementById(name+"State").textContent = "交易中";
           document.getElementById(name+"SaleBtn").textContent = "拍賣";
           document.getElementById(name+"State").className = "";
           document.getElementById(name+"Bid").className = "notSales";
@@ -139,14 +139,12 @@
           }
           console.log(transactSuccess);
           if (transactSuccess) {
+            document.getElementById(name+"State").textContent = "更換擁有者";
             console.log("change owner");
             await Contract.methods.changeOwner(productName.toLowerCase(), maxBidder)
-            .send({from: curAccount}, function(err, res) {
-              if (err == null) {
-                document.getElementById(productName+"Owner").textContent = "Owner "+maxBidder;
-                document.getElementById(productName+"SaleBtn").className = "disable";
-              }
-            })
+            .send({from: curAccount})
+            writeInfo(curAccount);
+            document.getElementById(name+"State").textContent = "非賣品";
           }
         }
       }
